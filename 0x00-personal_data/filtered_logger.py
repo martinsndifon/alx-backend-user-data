@@ -5,6 +5,9 @@ import re
 import logging
 
 
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
+
+
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """Returns an obfuscated log message passed in message"""
@@ -32,3 +35,19 @@ class RedactingFormatter(logging.Formatter):
         record.msg = filter_datum(self.fields, self.REDACTION,
                                   record.getMessage(), self.SEPARATOR)
         return super().format(record)
+
+
+def get_logger() -> logging.Logger:
+    """Returns a new log object"""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+
+    logger.propagate = False
+
+    fmt = RedactingFormatter(PII_FIELDS)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(fmt)
+
+    logger.addHandler(stream_handler)
+    
+    return logger
