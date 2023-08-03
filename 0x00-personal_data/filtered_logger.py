@@ -64,3 +64,29 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
 
     return mysql.connector.connect(host=DB_HOST, user=DB_USER,
                                    password=DB_PASSWORD, database=DB_NAME)
+
+
+def main() -> None:
+    """Main function"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    fmt = RedactingFormatter(PII_FIELDS)
+    for (name, email, phone, ssn, password, ip, last_login,
+         user_agent) in cursor:
+        message = (
+            f'name={name};email={email};phone={phone};ssn={ssn}'
+            f'password={password};ip={ip};'
+            f'last_login={last_login};user_agent={user_agent};'
+        )
+        logger = logging.LogRecord('user_data', logging.INFO, None, None,
+                                   message, None, None)
+
+        print(fmt.format(logger))
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == '__main__':
+    main()
