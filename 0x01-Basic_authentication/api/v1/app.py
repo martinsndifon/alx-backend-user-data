@@ -29,6 +29,7 @@ def not_found(error) -> str:
     """
     return jsonify({"error": "Not found"}), 404
 
+
 @app.errorhandler(401)
 def unauthorized(error) -> str:
     """Unauthorized handler"""
@@ -52,7 +53,7 @@ def auth_req():
     auth_val = auth.authorization_header(request)
     if not auth_:
         pass
-    #elif not auth.authorization_header(request):
+    # elif not auth.authorization_header(request):
     elif not auth_val:
         abort(401)
     elif not auth.current_user(request):
