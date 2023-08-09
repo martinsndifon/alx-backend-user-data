@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Authentication module"""
 from flask import request
-from typing import List, TypeVar
+from typing import List, TypeVar, Union
+import os
 
 
 class Auth():
@@ -38,3 +39,13 @@ class Auth():
     def current_user(self, request=None) -> TypeVar('User'):
         """Retrieve current user"""
         return None
+
+    def session_cookie(self, request=None) -> Union[str, None]:
+        """Returns a cookie value from a request"""
+        if not request:
+            return None
+        cookies = request.cookies
+        if not cookies:
+            return None
+        session_name: str = os.environ.get('SESSION_NAME')
+        return cookies.get(session_name)
