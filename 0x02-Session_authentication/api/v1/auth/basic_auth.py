@@ -9,9 +9,6 @@ from models.base import DATA
 
 class BasicAuth(Auth):
     """Basic auth class"""
-    def __init__(self):
-        """Initialize the class"""
-        super().__init__()
 
     def extract_base64_authorization_header(self,
                                             authorization_header: str) -> str:
