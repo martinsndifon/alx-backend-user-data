@@ -24,4 +24,3 @@ class SessionAuth(Auth):
             return None
         user_id: str = self.user_id_by_session_id.get(session_id)
         return user_id
-
