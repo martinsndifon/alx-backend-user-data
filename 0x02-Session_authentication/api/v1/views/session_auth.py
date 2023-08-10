@@ -4,6 +4,7 @@ from api.v1.views import app_views
 from flask import request, jsonify, make_response
 from models.user import User
 import os
+from typing import Union, Dict
 
 
 @app_views.route('/auth_session/login', methods=['POST'], strict_slashes=False)
@@ -29,3 +30,13 @@ def create_session() -> str:
             res.set_cookie(session_name, session_id)
             return res
     return jsonify({"error": "wrong password"}), 401
+
+
+@app_views.route(
+        '/auth_session/logout', methods=['DELETE'], strict_slashes=False)
+def delete_session() -> Union[bool, Dict]:
+    """delete user session on logout"""
+    from api.v1.app import auth
+    if not auth.destroy_session(request):
+        abort(404)
+    return jsonify({}), 200
