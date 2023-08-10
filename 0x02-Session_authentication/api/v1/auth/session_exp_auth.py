@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 class SessionExpAuth(SessionAuth):
     """Session auth expiration class"""
     session_dictionary = {}
+
     def __init__(self):
         """Initialize the class"""
         duration = os.environ.get('SESSION_DURATION')
