@@ -8,9 +8,9 @@ from datetime import datetime, timedelta
 
 class SessionExpAuth(SessionAuth):
     """Session auth expiration class"""
+    session_dictionary = {}
     def __init__(self):
         """Initialize the class"""
-        super().__init__()
         duration = os.environ.get('SESSION_DURATION')
         try:
             if not duration:
@@ -19,7 +19,6 @@ class SessionExpAuth(SessionAuth):
         except ValueError:
             duration = 0
         self.session_duration = duration
-        self.session_dictionary = {}
 
     def create_session(self, user_id=None) -> Union[str, None]:
         """create new session from super() class"""
