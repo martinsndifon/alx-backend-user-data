@@ -10,6 +10,7 @@ from models.base import DATA
 
 class SessionDBAuth(SessionExpAuth):
     """Session auth with DB integration and expiration"""
+
     def create_session(self, user_id=None) -> Union[str, None]:
         """create a new session"""
         if not user_id:
@@ -48,10 +49,10 @@ class SessionDBAuth(SessionExpAuth):
         if not session_id:
             return False
         if 'UserSession' not in DATA:
-            return None
+            return False
         session = UserSession.search({'session_id': session_id})
         if not session:
-            return None
+            return False
         session = session[0]
         session.remove()
         return True
