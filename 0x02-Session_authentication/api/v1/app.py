@@ -60,14 +60,14 @@ def auth_req():
     exclud = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/',
               '/api/v1/auth_session/login/']
     auth_ = auth.require_auth(path, exclud)
-    auth_val = auth.authorization_header(request)
-    current_user = auth.current_user(request)
-    cookie = auth.session_cookie(request)
     if not auth_:
-        pass
-    elif not auth_val and not cookie:
+        return
+    auth_val = auth.authorization_header(request)
+    cookie = auth.session_cookie(request)
+    if not auth_val and not cookie:
         abort(401)
-    elif not current_user:
+    current_user = auth.current_user(request)
+    if not current_user:
         abort(403)
     request.current_user = current_user
 
