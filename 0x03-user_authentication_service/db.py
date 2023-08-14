@@ -43,11 +43,13 @@ class DB:
     def find_user_by(self, **kwargs: Dict) -> User:
         """Find a user in the DB using input arguments"""
         session = self._session
-        if 'email' in kwargs or 'id' in kwargs:
+        if 'email' in kwargs or 'id' in kwargs or 'session_id' in kwargs:
             email = kwargs.get('email')
             id = kwargs.get('id')
+            session_id = kwargs.get('session_id')
             user = self.__session.query(User).filter(
-                    or_(User.email == email, User.id == id)).first()
+                    or_(User.email == email, User.id == id,
+                        User.session_id == session_id)).first()
 
             if not user:
                 raise NoResultFound
