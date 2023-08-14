@@ -42,6 +42,7 @@ class DB:
 
     def find_user_by(self, **kwargs: Dict) -> User:
         """Find a user in the DB using input arguments"""
+        session = self._session
         if 'email' in kwargs or 'id' in kwargs:
             email = kwargs.get('email')
             id = kwargs.get('id')
