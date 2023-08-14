@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DB module
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -40,14 +40,24 @@ class DB:
         session.commit()
         return user
 
-    def find_user_by(self, **kwargs: Dict):
+    def find_user_by(self, **kwargs: Dict) -> User:
         """Find a user in the DB using input arguments"""
-        if 'email' not in kwargs:
+        if 'email' in kwargs or 'id' in kwargs:
+            email = kwargs.get('email')
+            id = kwargs.get('id')
+            user = self.__session.query(User).filter(
+                    or_(User.email == email, User.id == id)).first()
+
+            if not user:
+                raise NoResultFound
+            return user
+        else:
             raise InvalidRequestError
 
-        email = kwargs.get('email')
-        user = self.__session.query(User).filter_by(email=email).first()
-
-        if not user:
-            raise NoResultFound
-        return user
+    def update_user(self, user_id: int, **kwargs: Dict) -> None:
+        """Updates a user in the DB"""
+        if 'hashed_password' not in kwargs:
+            raise ValueError
+        user = self.find_user_by(id=user_id)
+        user.hashed_password = kwargs.get('hashed_password')
+        self.__session.commit()
