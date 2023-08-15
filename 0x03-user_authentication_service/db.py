@@ -72,7 +72,8 @@ class DB:
             raise ValueError
         user = self.find_user_by(id=user_id)
         user.hashed_password = kwargs.get('hashed_password')
-        self.__session.commit()
+        self._session.add(user)
+        self._session.commit()
 
     def session(self) -> Session:
         """Return the session object"""
