@@ -2,7 +2,6 @@
 """flask app"""
 from flask import Flask, jsonify, request, abort, redirect, url_for
 from auth import Auth
-from sqlalchemy.orm.exc import NoResultFound
 
 
 AUTH = Auth()
@@ -11,13 +10,13 @@ app = Flask(__name__)
 
 
 @app.route('/', methods=["GET"], strict_slashes=False)
-def status():
-    """flask app status"""
+def index():
+    """Home page"""
     return jsonify({"message": "Bienvenue"})
 
 
 @app.route('/users', methods=['POST'], strict_slashes=False)
-def users():
+def register_users():
     """Route to register a new user"""
     data = request.form
     email = data.get('email')
@@ -31,11 +30,13 @@ def users():
 
 
 @app.route('/sessions', methods=['POST'], strict_slashes=False)
-def login():
+def login_user():
     """create a new session when user logs in"""
     data = request.form
     email = data.get('email')
     password = data.get('password')
+    if not email or not password:
+        abort(401)
     user = AUTH.valid_login(email, password)
     if not user:
         abort(401)
@@ -46,9 +47,11 @@ def login():
 
 
 @app.route('/sessions', methods=['DELETE'], strict_slashes=False)
-def logout():
+def logout_user():
     """Logout the user"""
     session_id = request.cookies.get('session_id')
+    if not session_id:
+        abort(403)
     user = AUTH.get_user_from_session_id(session_id)
     if not user:
         abort(403)
@@ -67,13 +70,15 @@ def profile():
     if not user:
         abort(403)
     email = user.email
-    return jsonify({"email": email})
+    return jsonify({"email": email}), 200
 
 
 @app.route('/reset_password', methods=['GET'], strict_slashes=False)
 def get_reset_password_token():
     """Get the password reset token for a user with email"""
     email = request.form.get('email')
+    if not email:
+        abort(403)
     try:
         reset_token = AUTH.get_reset_password_token(email)
         return jsonify({"email": email, "reset_token": reset_token})
@@ -88,9 +93,10 @@ def update_password():
     email = data.get('email')
     reset_token = data.get('reset_token')
     new_password = data.get('new_password')
-
+    if not (email and reset_token and password):
+        abort(403)
     try:
-        update_password(reset_token, new_password)
+        AUTH.update_password(reset_token, new_password)
         return jsonify({"email": email, "message": "Password updated"}), 200
     except ValueError:
         abort(403)
