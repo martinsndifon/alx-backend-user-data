@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DB module
 """
-from sqlalchemy import create_engine, or_
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -44,27 +44,11 @@ class DB:
     def find_user_by(self, **kwargs: Dict) -> User:
         """Find a user in the DB using input arguments"""
         session = self._session
-
-        email = kwargs.get('email')
-        id = kwargs.get('id')
-        session_id = kwargs.get('session_id')
-        if not session_id:
-            session_id = 0
-        reset_token = kwargs.get('reset_token')
-        if not reset_token:
-            reset_token = 0
-
-        if any(key in kwargs for key in self.params):
-            user = session.query(User).filter(
-                    or_(User.email == email, User.id == id,
-                        User.session_id == session_id,
-                        User.reset_token == reset_token)).first()
-
-            if not user:
-                raise NoResultFound
+        try:
+            user = session.query(User).filter_by(**kwargs).one()
             return user
-        else:
-            raise InvalidRequestError
+        except (NoResultFound, InvalidRequestError):
+            raise
 
     def update_user(self, user_id: int, **kwargs: Dict) -> None:
         """Updates a user in the DB"""
