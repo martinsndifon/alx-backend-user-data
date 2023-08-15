@@ -71,7 +71,11 @@ class DB:
         if 'hashed_password' not in kwargs:
             raise ValueError
         user = self.find_user_by(id=user_id)
-        user.hashed_password = kwargs.get('hashed_password')
+        columns = User.__table__.columns.keys()
+        for key, value in kwargs.items():
+            if key not in columns:
+                raise ValueError
+            setattr(user, key, value)
         self._session.add(user)
         self._session.commit()
 
