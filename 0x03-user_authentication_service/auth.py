@@ -2,7 +2,7 @@
 """Authentication module"""
 import bcrypt
 from db import DB
-from user import User 
+from user import User
 from sqlalchemy.orm.exc import NoResultFound
 import uuid
 from typing import Union
@@ -23,7 +23,7 @@ class Auth:
         """Initialize the class"""
         self._db = DB()
 
-    def register_user(self, email: str, password:str) -> User:
+    def register_user(self, email: str, password: str) -> User:
         """Register a new user in the DB"""
         try:
             user = self._db.find_user_by(email=email)
@@ -56,7 +56,7 @@ class Auth:
             if user:
                 id = self._generate_uuid()
                 user.session_id = id
-                session = self._db._session
+                session = self._db.session()
                 session.commit()
                 return user.session_id
         except NoResultFound:
@@ -79,8 +79,35 @@ class Auth:
             user = self._db.find_user_by(id=user_id)
             if user:
                 user.session_id = None
-                session = self._db._session
+                session = self._db.session()
                 session.commit()
                 return None
         except NoResultFound:
             return None
+
+    def get_reset_password_token(self, email: str) -> str:
+        """Update the user reset_password token"""
+        try:
+            user = self._db.find_user_by(email=email)
+            if user:
+                id = self._generate_uuid()
+                user.reset_token = id
+                session = self._db.session()
+                session.commit()
+                return user.reset_token
+        except NoResultFound:
+            raise ValueError
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """updates the user password given a correct reset_token"""
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+            if user:
+                hashed_password = _hash_password(password)
+                user.hashed_password = hashed_password
+                user.reset_token = None
+                session = self._db.session()
+                session.commit()
+                return None
+        except NoResultFound:
+            raise ValueError
