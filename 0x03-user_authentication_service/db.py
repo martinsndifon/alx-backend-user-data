@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from typing import Dict
 from user import Base, User
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
@@ -50,7 +49,7 @@ class DB:
         except (NoResultFound, InvalidRequestError):
             raise
 
-    def update_user(self, user_id: int, **kwargs: Dict) -> None:
+    def update_user(self, user_id: int, **kwargs) -> None:
         """Updates a user in the DB"""
         user = self.find_user_by(id=user_id)
         columns = User.__table__.columns.keys()
