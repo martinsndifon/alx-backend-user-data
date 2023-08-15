@@ -68,8 +68,6 @@ class DB:
 
     def update_user(self, user_id: int, **kwargs: Dict) -> None:
         """Updates a user in the DB"""
-        if 'hashed_password' not in kwargs:
-            raise ValueError
         user = self.find_user_by(id=user_id)
         columns = User.__table__.columns.keys()
         for key, value in kwargs.items():
