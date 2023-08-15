@@ -57,7 +57,7 @@ def logout_user():
         abort(403)
     user_id = user.id
     AUTH.destroy_session(user_id)
-    return redirect(url_for('app.status'))
+    return redirect(url_for('index'))
 
 
 @app.route('/profile', methods=['GET'], strict_slashes=False)
@@ -73,7 +73,7 @@ def profile():
     return jsonify({"email": email}), 200
 
 
-@app.route('/reset_password', methods=['GET'], strict_slashes=False)
+@app.route('/reset_password', methods=['POST'], strict_slashes=False)
 def get_reset_password_token():
     """Get the password reset token for a user with email"""
     email = request.form.get('email')
@@ -93,7 +93,7 @@ def update_password():
     email = data.get('email')
     reset_token = data.get('reset_token')
     new_password = data.get('new_password')
-    if not (email and reset_token and password):
+    if not (email and reset_token and new_password):
         abort(403)
     try:
         AUTH.update_password(reset_token, new_password)
