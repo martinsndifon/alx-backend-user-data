@@ -60,7 +60,3 @@ class DB:
             setattr(user, key, value)
         self._session.add(user)
         self._session.commit()
-
-    def session(self) -> Session:
-        """Return the session object"""
-        return self.__session
